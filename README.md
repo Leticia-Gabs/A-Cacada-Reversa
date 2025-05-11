@@ -1,4 +1,4 @@
-# Pac-Man Fantasma: A Caçada Invertida 🎮
+# Pac-Man Fantasma: A Caçada Reversa 🎮
 
 ## Descrição do Jogo 🎯
 
