@@ -6,10 +6,15 @@ No **Pac-Man Fantasma**, o jogo vira de cabeça para baixo! Em vez de fugir do f
 
 ### Regras:
 - Seja o fantasma e capture o humano!
-- O humano tenta escapar, mas você pode pegar ele se for rápido.
+- O humano tenta escapar, mas você pode pegá-lo se for rápido.
 - O jogo termina quando o fantasma captura o humano ou o humano escapa.
 
 Divirta-se caçando! 👻
+
+## Biblioteca Utilizada 🧱
+
+Este projeto utiliza a biblioteca **[CLI-lib](https://github.com/tgfb/cli-lib)** para manipulação de gráficos no terminal (modo texto).  
+➡️ A biblioteca já está **inclusa no repositório**, na pasta `cli-lib/`.
 
 ## Instruções para Compilar e Executar ⚙️
 
@@ -33,27 +38,14 @@ Divirta-se caçando! 👻
     ./build/pacman_fantasma
     ```
 
-## Estrutura do Projeto 🗂️
+> Certifique-se de que a pasta `cli-lib/` está presente no projeto, pois ela é essencial para a execução correta do jogo.
 
-```
-/projeto
-├── src/            # Código-fonte (.c)
-├── include/        # Cabeçalhos (.h)
-├── build/          # Saídas de compilação
-├── README.md       # Descrição do projeto
-├── Makefile        # Arquivo de build
-└── LICENSE         # Licença
-```
-
-## Licença 📝
-
-Licença MIT. Consulte o arquivo `LICENSE` para mais informações.
 
 ## Integrantes do Projeto 👨‍💻
 
-- **Dayvid Cristiano Viana da Silva** – [@dayvidcristiano](https://github.com/dayvidcristiano)
-- **Jeniffer Cristine Lopes da Conceição** – [@jenixcri](https://github.com/jenixcri)
-- **Letícia Gabriella Da Costa Silva** – [@Leticia-Gabs](https://github.com/Leticia-Gabs)
+- **Dayvid Cristiano Viana da Silva** – [@dayvidcs](https://github.com/dayvidcs)
+- **Jeniffer Cristine Lopes da Conceição** – [@jeniffercristine](https://github.com/jeniffercristine)
+- **Letícia Gabriella Da Costa Silva** – [@leticiagabriella](https://github.com/leticiagabriella)
 
 ## Disciplina 📚
 
@@ -61,4 +53,4 @@ Licença MIT. Consulte o arquivo `LICENSE` para mais informações.
 
 ## Instituição de Ensino 🏫
 
-**CESAR School**
+**Centro de Estudos e Sistemas Avançados do Recife (CESAR)**
