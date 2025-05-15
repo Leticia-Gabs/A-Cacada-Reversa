@@ -1,89 +1,64 @@
-/**
- * main.h
- * Created on Aug, 23th 2023
- * Author: Tiago Barros
- * Based on "From C to C++ course - 2002"
-*/
-
-#include <string.h>
-
-#include "screen.h"
+#include <stdio.h>
 #include "keyboard.h"
+#include "screen.h"
 #include "timer.h"
 
-int x = 34, y = 12;
-int incX = 1, incY = 1;
+#define MAP_WIDTH 20
+#define MAP_HEIGHT 10
 
-void printHello(int nextX, int nextY)
-{
-    screenSetColor(CYAN, DARKGRAY);
-    screenGotoxy(x, y);
-    printf("           ");
-    x = nextX;
-    y = nextY;
-    screenGotoxy(x, y);
-    printf("Hello World");
+static const char map[MAP_HEIGHT][MAP_WIDTH + 1] = {
+    "--------------------",
+    "|        |         |",
+    "|  ---   |  ----   |",
+    "|  |     |     |   |",
+    "|  |     |     |   |",
+    "|  |     |     |   |",
+    "|        |         |",
+    "|   ----------     |",
+    "|                  |",
+    "--------------------"
+};
+
+int is_walkable(int x, int y) {
+    if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT)
+        return 0;
+    return map[y][x] == ' ';
 }
 
-void printKey(int ch)
-{
-    screenSetColor(YELLOW, DARKGRAY);
-    screenGotoxy(35, 22);
-    printf("Key code :");
+int main() {
+    int player_x = 1, player_y = 1;
+    int running = 1;
 
-    screenGotoxy(34, 23);
-    printf("            ");
-    
-    if (ch == 27) screenGotoxy(36, 23);
-    else screenGotoxy(39, 23);
+    init_keyboard();
+    init_screen();
 
-    printf("%d ", ch);
-    while (keyhit())
-    {
-        printf("%d ", readch());
-    }
-}
+    while (running) {
+        refresh_screen();
+        draw_player(player_x, player_y);
 
-int main() 
-{
-    static int ch = 0;
-    static long timer = 0;
+        if (keyboard_hit()) {
+            int key = get_key();
+            int new_x = player_x;
+            int new_y = player_y;
 
-    screenInit(1);
-    keyboardInit();
-    timerInit(50);
+            switch (key) {
+                case 'w': case 'W': new_y--; break;
+                case 's': case 'S': new_y++; break;
+                case 'a': case 'A': new_x--; break;
+                case 'd': case 'D': new_x++; break;
+                case 'q': case 'Q': running = 0; break;
+            }
 
-    printHello(x, y);
-    screenUpdate();
-
-    while (ch != 10 && timer <= 100) //enter or 5s
-    {
-        // Handle user input
-        if (keyhit()) 
-        {
-            ch = readch();
-            printKey(ch);
-            screenUpdate();
+            if (is_walkable(new_x, new_y)) {
+                player_x = new_x;
+                player_y = new_y;
+            }
         }
-
-        // Update game state (move elements, verify collision, etc)
-        if (timerTimeOver() == 1)
-        {
-            int newX = x + incX;
-            if (newX >= (MAXX -strlen("Hello World") -1) || newX <= MINX+1) incX = -incX;
-            int newY = y + incY;
-            if (newY >= MAXY-1 || newY <= MINY+1) incY = -incY;
-
-            printHello(newX, newY);
-
-            screenUpdate();
-            timer++;
-        }
+        delay_ms(50);
     }
 
-    keyboardDestroy();
-    screenDestroy();
-    timerDestroy();
-
+    close_keyboard();
+    clear_screen();
+    printf("Jogo encerrado. Obrigado por jogar!\n");
     return 0;
 }
