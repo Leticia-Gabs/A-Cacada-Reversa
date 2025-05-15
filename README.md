@@ -20,7 +20,7 @@ Este projeto utiliza a biblioteca **[CLI-lib](https://github.com/tgfb/cli-lib)**
 
 1. **Clone o repositório**:
     ```bash
-    git clone <URL_DO_REPOSITORIO>
+    git clone https://github.com/Leticia-Gabs/A-Cacada-Reversa.git
     ```
 
 2. **Navegue até a pasta do projeto**:
