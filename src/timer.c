@@ -1,9 +1,5 @@
-#include <time.h>
-#include "timer.h"
+#include <unistd.h>
 
-void delay_ms(int milliseconds) {
-    struct timespec ts;
-    ts.tv_sec = milliseconds / 1000;
-    ts.tv_nsec = (milliseconds % 1000) * 1000000;
-    nanosleep(&ts, NULL);
+void delay_ms(int ms) {
+    usleep(ms * 1000);
 }
