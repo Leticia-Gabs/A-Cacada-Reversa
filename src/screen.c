@@ -5,7 +5,7 @@ void init_screen() {
     // Pode ficar vazio ou configurar o terminal se quiser
 }
 
-void clear_screen() {
+void screenClear() {
     printf("\e[1;1H\e[2J");
 }
 
@@ -26,7 +26,7 @@ void draw_enemy(int x, int y) {
 }
 
 void refresh_screen(int player_x, int player_y, const char map[][MAP_WIDTH + 1]) {
-    clear_screen();
+    screenClear();
     draw_map(map);
     draw_player(player_x, player_y);
 }

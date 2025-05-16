@@ -6,7 +6,7 @@
 
 static struct termios oldt, newt;
 
-void init_keyboard() {
+void keyboardInit() {
     tcgetattr(STDIN_FILENO, &oldt);
     newt = oldt;
     newt.c_lflag &= ~(ICANON | ECHO);
@@ -14,11 +14,11 @@ void init_keyboard() {
     fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
 }
 
-void close_keyboard() {
+void keyboardDestroy() {
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 }
 
-int keyboard_hit() {
+int keyhit() {
     int ch = getchar();
     if (ch != EOF) {
         ungetc(ch, stdin);
@@ -27,6 +27,6 @@ int keyboard_hit() {
     return 0;
 }
 
-int get_key() {
+int readch() {
     return getchar();
 }

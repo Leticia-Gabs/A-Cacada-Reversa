@@ -1,9 +1,9 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-void init_keyboard();
-void close_keyboard();
-int keyboard_hit();
-int get_key();
+void keyboardInit();
+void keyboardDestroy();
+int keyhit();;
+int readch();
 
 #endif

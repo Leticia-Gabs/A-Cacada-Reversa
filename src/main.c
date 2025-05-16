@@ -39,7 +39,7 @@ int main() {
     time_t start_time = time(NULL);
 
     srand(time(NULL));
-    init_keyboard();
+    keyboardInit();
     init_screen();
 
     while (running) {
@@ -79,9 +79,9 @@ int main() {
             }
         }
 
-        // Movimento do jogador
-        if (keyboard_hit()) {
-            int key = get_key();
+        // Movimento do jogd.
+        if (keyhit()) {
+            int key = readch();
             int new_x = player_x;
             int new_y = player_y;
 
@@ -99,9 +99,9 @@ int main() {
             }
         }
 
-        // Condição de vitória: jogador alcança portal
+        // vitória: jogador chega no portal
         if (map[player_y][player_x] == 'P') {
-            clear_screen();
+            screenClear();
             printf("O jogador escapou pelo portal! Você venceu!\n");
             break;
         }
@@ -109,7 +109,7 @@ int main() {
         // Condição de derrota: tempo esgotado
         time_t elapsed = time(NULL) - start_time;
         if (elapsed >= 120) {
-            clear_screen();
+            screenClear();
             printf("Tempo esgotado! Game Over.\n");
             break;
         }
@@ -120,7 +120,7 @@ int main() {
             if (enemies[i].alive) enemies_alive++;
         }
         if (enemies_alive == 0) {
-            clear_screen();
+            screenClear();
             printf("Todos os inimigos foram pegos! Você venceu!\n");
             break;
         }
@@ -128,6 +128,6 @@ int main() {
         delay_ms(100);
     }
 
-    close_keyboard();
+    keyboardDestroy();
     return 0;
 }

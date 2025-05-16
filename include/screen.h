@@ -5,7 +5,7 @@
 #define MAP_HEIGHT 12
 
 void init_screen();
-void clear_screen();
+void screenClear();
 void draw_map(const char map[][MAP_WIDTH + 1]);
 void draw_player(int x, int y);
 void draw_enemy(int x, int y);
