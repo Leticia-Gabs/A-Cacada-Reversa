@@ -4,6 +4,7 @@
 #include "keyboard.h"
 #include "screen.h"
 #include "timer.h"
+#include "menu.h"
 
 #define MAP_HEIGHT 12
 #define MAP_WIDTH 25
@@ -11,9 +12,8 @@
 #define MAX_ROUNDS 5
 #define ROUND_TIME_LIMIT 120 // segundos
 
-// Mapas diferentes para cada rodada
 static const char maps[MAX_ROUNDS][MAP_HEIGHT][MAP_WIDTH + 1] = {
-    { // Mapa da Rodada 1
+    {
         "-------------------------",
         "|         |         P   |",
         "| ---     | ----        |",
@@ -27,7 +27,7 @@ static const char maps[MAX_ROUNDS][MAP_HEIGHT][MAP_WIDTH + 1] = {
         "|                       |",
         "-------------------------"
     },
-    { // Mapa da Rodada 2
+    {
         "-------------------------",
         "|P     |                |",
         "| ---- | -----          |",
@@ -41,7 +41,7 @@ static const char maps[MAX_ROUNDS][MAP_HEIGHT][MAP_WIDTH + 1] = {
         "|                       |",
         "-------------------------"
     },
-    { // Mapa da Rodada 3
+    {
         "-------------------------",
         "|         |             |",
         "| ---     | ----    | P |",
@@ -55,7 +55,7 @@ static const char maps[MAX_ROUNDS][MAP_HEIGHT][MAP_WIDTH + 1] = {
         "|                       |",
         "-------------------------"
     },
-    { // Mapa da Rodada 4
+    {
         "-------------------------",
         "|         |         P   |",
         "|     -----            |",
@@ -69,7 +69,7 @@ static const char maps[MAX_ROUNDS][MAP_HEIGHT][MAP_WIDTH + 1] = {
         "|                      |",
         "-------------------------"
     },
-    { // Mapa da Rodada 5
+    {
         "-------------------------",
         "| P |        |         |",
         "|---|   ---- | ----    |",
@@ -128,6 +128,14 @@ void load_map(int round_index) {
 }
 
 int main() {
+    char nome_jogador[100];
+
+    srand(time(NULL));
+    keyboardInit();
+    init_screen();
+
+    exibir_menu(nome_jogador, sizeof(nome_jogador));
+
     int player_x, player_y;
     Enemy enemies[NUM_ENEMIES];
     Point points[MAP_HEIGHT * MAP_WIDTH];
@@ -136,10 +144,6 @@ int main() {
     int score = 0;
     int running = 1;
     time_t round_start_time;
-
-    srand(time(NULL));
-    keyboardInit();
-    init_screen();
 
     while (running && round < MAX_ROUNDS) {
         load_map(round);
@@ -158,7 +162,7 @@ int main() {
 
         while (running && !round_over) {
             refresh_screen(player_x, player_y, map);
-            draw_text(0, 0, "Rodada: %d  Pontuacao: %d", round + 1, score);
+            draw_text(0, 0, "Jogador: %s | Rodada: %d | Pontos: %d", nome_jogador, round + 1, score);
 
             for (int i = 0; i < num_points; i++) {
                 if (!points[i].collected) draw_point(points[i].x, points[i].y);
