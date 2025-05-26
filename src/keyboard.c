@@ -6,7 +6,8 @@
 static struct termios initial_settings, new_settings;
 static int peek_character = -1;
 
-void keyboardInit() {
+void keyboardInit()
+{
     tcgetattr(0, &initial_settings);
     new_settings = initial_settings;
     new_settings.c_lflag &= ~(ICANON | ECHO);
@@ -15,15 +16,18 @@ void keyboardInit() {
     tcsetattr(0, TCSANOW, &new_settings);
 }
 
-void keyboardDestroy() {
+void keyboardDestroy()
+{
     tcsetattr(0, TCSANOW, &initial_settings);
 }
 
-int keyhit() {
+int keyhit()
+{
     unsigned char ch;
     int nread;
 
-    if (peek_character != -1) return 1;
+    if (peek_character != -1)
+        return 1;
 
     int flags = fcntl(0, F_GETFL, 0);
     fcntl(0, F_SETFL, flags | O_NONBLOCK);
@@ -32,7 +36,8 @@ int keyhit() {
 
     fcntl(0, F_SETFL, flags);
 
-    if (nread == 1) {
+    if (nread == 1)
+    {
         peek_character = ch;
         return 1;
     }
@@ -40,10 +45,12 @@ int keyhit() {
     return 0;
 }
 
-int readch() {
+int readch()
+{
     char ch;
 
-    if (peek_character != -1) {
+    if (peek_character != -1)
+    {
         ch = peek_character;
         peek_character = -1;
         return ch;

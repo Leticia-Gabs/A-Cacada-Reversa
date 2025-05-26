@@ -5,7 +5,8 @@
 #include "menu.h"
 
 // Exibe o menu inicial e captura o nome do jogador
-void exibir_menu(char* nome_jogador, int tamanho_max) {
+void exibir_menu(char *nome_jogador, int tamanho_max)
+{
     screenClear();
     init_screen(); // Inicializa a tela e, SE implementado em screen.c, desenha as bordas
 
@@ -32,7 +33,8 @@ void exibir_menu(char* nome_jogador, int tamanho_max) {
     draw_text(10, 8, "Pressione ENTER para comecar a captura...");
 
     keyboardInit();
-    while (readch() != 10);
+    while (readch() != 10)
+        ;
     keyboardDestroy();
 
     // Limpa antes de iniciar o jogo
