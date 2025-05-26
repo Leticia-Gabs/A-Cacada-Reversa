@@ -4,7 +4,7 @@ CFLAGS = -Wall -Werror -g -I$(INCLUDE_DIR)
 LIBS = -lncurses
 
 # Project name
-PROJ_NAME = cli-lib-example
+PROJ_NAME = jogo
 
 # Target directories
 BUILD_DIR   = build
@@ -39,4 +39,4 @@ clean:
 
 # Run target
 run: all
-	./$(BUILD_DIR)/cli-lib-example
+	./$(BUILD_DIR)/$(PROJ_NAME)

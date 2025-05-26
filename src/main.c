@@ -5,84 +5,15 @@
 #include "screen.h"
 #include "timer.h"
 #include "menu.h"
+#include "score.h"
 
 #define MAP_HEIGHT 12
 #define MAP_WIDTH 25
 #define MAX_ROUNDS 5
 #define ROUND_TIME_LIMIT 120 // segundos
 
-// Mapas diferentes para cada rodada
 static const char maps[MAX_ROUNDS][MAP_HEIGHT][MAP_WIDTH + 1] = {
-    {
-        "-------------------------",
-        "|         |             |",
-        "| ---     |   --        |",
-        "| |       |   |         |",
-        "| |       |   |         |",
-        "| |       |   |         |",
-        "|           |           |",
-        "|    -------            |",
-        "|                       |",
-        "|     -----             |",
-        "|                       |",
-        "-------------------------"
-    },
-    {
-        "-------------------------",
-        "|      |                |",
-        "| ---- | -----          |",
-        "|      |     |          |",
-        "|      |     |          |",
-        "|      |     |          |",
-        "|            |          |",
-        "|  ----------           |",
-        "|                       |",
-        "|     -----             |",
-        "|                       |",
-        "-------------------------"
-    },
-    {
-        "-------------------------",
-        "|         |             |",
-        "| ---     |  --     |   |",
-        "| |       |   |     --  |",
-        "| |       |   |         |",
-        "| |       |   |         |",
-        "|                       |",
-        "|    ----------         |",
-        "|                       |",
-        "|     -----             |",
-        "|                       |",
-        "-------------------------"
-    },
-    {
-        "-------------------------",
-        "|         |            |",
-        "|     --               |",
-        "|     |   |            |",
-        "|     |   |            |",
-        "|     |   |            |",
-        "|         |            |",
-        "|  ----------          |",
-        "|                      |",
-        "|     -----            |",
-        "|                      |",
-        "-------------------------"
-    },
-    {
-        "-------------------------",
-        "|                      |",
-        "|---|   ---  |  ---    |",
-        "|   |   |        |     |",
-        "|   |   |        |     |",
-        "|   |   |        |     |",
-        "|       |              |",
-        "|  ----------          |",
-        "|                      |",
-        "|     -----            |",
-        "|                      |",
-        "-------------------------"
-    }
+    // ... [mantém seus mapas] ...
 };
 
 static char map[MAP_HEIGHT][MAP_WIDTH + 1];
@@ -97,11 +28,11 @@ typedef struct {
     int collected;
 } Point;
 
+// Funções auxiliares
 int is_walkable(int x, int y) {
     if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT)
         return 0;
-    char c = map[y][x];
-    return (c == ' ');
+    return (map[y][x] == ' ');
 }
 
 int initialize_points(Point points[], int max_points) {
@@ -109,10 +40,7 @@ int initialize_points(Point points[], int max_points) {
     for (int i = 0; i < MAP_HEIGHT && num_points < max_points; i++) {
         for (int j = 0; j < MAP_WIDTH && num_points < max_points; j++) {
             if (map[i][j] == ' ') {
-                points[num_points].x = j;
-                points[num_points].y = i;
-                points[num_points].collected = 0;
-                num_points++;
+                points[num_points++] = (Point){j, i, 0};
             }
         }
     }
@@ -127,16 +55,35 @@ void load_map(int round_index) {
     }
 }
 
+void finalizar_jogo(const char* nome_jogador, const char* mensagem_final, int pontuacao) {
+    keyboardDestroy();
+    screenClear();
+    printf("%s\n", mensagem_final);
+    printf("Pontuação final: %d\n", pontuacao);
+
+    if (save_score("ranking.txt", nome_jogador, pontuacao)) {
+        printf("✅ Pontuação salva no ranking.\n");
+        PlayerScore scores[MAX_SCORES];
+        int count = load_scores("ranking.txt", scores, MAX_SCORES);
+        if (count > 0) {
+            sort_scores(scores, count);
+            print_ranking(scores, count);
+        } else {
+            printf("⚠️ Erro ao carregar ranking.\n");
+        }
+    } else {
+        printf("❌ Não foi possível salvar a pontuação.\n");
+    }
+}
+
 int main() {
     int player_x, player_y;
     Enemy enemy;
     Point points[MAP_HEIGHT * MAP_WIDTH];
     int num_points;
-    int round = 0;
-    int score = 0;
-    int running = 1;
+    int round = 0, running = 1;
     time_t round_start_time;
-    char nome_jogador[50];
+    char nome_jogador[MAX_NAME_LENGTH];
 
     srand(time(NULL));
     keyboardInit();
@@ -159,52 +106,37 @@ int main() {
 
         while (running && !round_over) {
             refresh_screen(map);
-
-            // Desenha status da rodada e pontuação
             char status[50];
-            sprintf(status, "Rodada: %d | Pontuação: %d", round + 1, score);
+            sprintf(status, "Rodada: %d | Pontuação: %d", round + 1, score_get());
             draw_text(0, 0, status);
 
-            // Desenha pontos
             for (int i = 0; i < num_points; i++) {
                 if (!points[i].collected) draw_point(points[i].x, points[i].y);
             }
 
-            if (enemy.alive) {
-                draw_text(enemy.x, enemy.y, "🟡");
-            }
-
-            // Desenha jogador 🟡
+            if (enemy.alive) draw_text(enemy.x, enemy.y, "🟡");
             draw_text(player_x, player_y, "👻");
 
-            // Verifica se jogador capturou inimigo
             if (enemy.alive && enemy.x == player_x && enemy.y == player_y) {
                 enemy.alive = 0;
-                score += 10;
+                score_add(10);
             }
 
-            // Movimento do inimigo
             if (enemy.alive) {
                 for (int attempt = 0; attempt < 4; attempt++) {
-                    int dir = rand() % 4;
-                    int nx = enemy.x;
-                    int ny = enemy.y;
-
+                    int dir = rand() % 4, nx = enemy.x, ny = enemy.y;
                     switch (dir) {
                         case 0: ny--; break;
                         case 1: ny++; break;
                         case 2: nx--; break;
                         case 3: nx++; break;
                     }
-
                     if (is_walkable(nx, ny) && !(nx == player_x && ny == player_y)) {
                         enemy.x = nx;
                         enemy.y = ny;
                         break;
                     }
                 }
-
-                // Verifica se o inimigo pegou um ponto
                 for (int i = 0; i < num_points; i++) {
                     if (!points[i].collected && points[i].x == enemy.x && points[i].y == enemy.y) {
                         points[i].collected = 1;
@@ -212,11 +144,9 @@ int main() {
                 }
             }
 
-            // Movimento do jogador
             if (keyhit()) {
                 int key = readch();
-                int nx = player_x;
-                int ny = player_y;
+                int nx = player_x, ny = player_y;
                 switch (key) {
                     case 'w': case 'W': ny--; break;
                     case 's': case 'S': ny++; break;
@@ -230,7 +160,6 @@ int main() {
                 }
             }
 
-            // Verifica se todos os pontos foram coletados
             int all_collected = 1;
             for (int i = 0; i < num_points; i++) {
                 if (!points[i].collected) {
@@ -241,29 +170,22 @@ int main() {
 
             time_t elapsed = time(NULL) - round_start_time;
             if (elapsed >= ROUND_TIME_LIMIT) {
-                keyboardDestroy();
-                screenClear();
-                printf("⏳ Tempo esgotado na Rodada %d! Game Over.\n", round + 1);
-                printf("Pontuação final: %d\n", score);
+                finalizar_jogo(nome_jogador, "⏳ Tempo esgotado!", score_get());
                 return 0;
             }
 
             if (all_collected) {
-                keyboardDestroy();
-                screenClear();
-                printf("💀 Os humanos coletaram todos os pontos! Game Over.\n");
-                printf("Pontuação final: %d\n", score);
+                finalizar_jogo(nome_jogador, "💀 Todos os pontos foram coletados!", score_get());
                 return 0;
             }
 
             if (!enemy.alive) {
                 for (int i = 0; i < num_points; i++) {
-                    if (!points[i].collected) score++;
+                    if (!points[i].collected) score_add(1);
                 }
-                keyboardDestroy();
                 screenClear();
                 printf("✅ Rodada %d concluída! Inimigo capturado.\n", round + 1);
-                printf("Pontuação atual: %d\n", score);
+                printf("Pontuação atual: %d\n", score_get());
                 delay_ms(2000);
                 keyboardInit();
                 init_screen();
@@ -275,11 +197,6 @@ int main() {
         }
     }
 
-    keyboardDestroy();
-    screenClear();
-    if (round >= MAX_ROUNDS) {
-        printf("🏆 Parabéns! Você completou todas as %d rodadas!\n", MAX_ROUNDS);
-    }
-    printf("Pontuação final: %d\n", score);
+    finalizar_jogo(nome_jogador, "🎉 Jogo finalizado!", score_get());
     return 0;
 }
